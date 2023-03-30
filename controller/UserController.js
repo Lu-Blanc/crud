@@ -1,82 +1,63 @@
-import createError from "../utils/createError.js";
 import User from "../model/UsersModel.js";
+import createError from "../utils/createError.js";
 
-export const getUsers = async(req, res) =>{
+export const getAllUser = async (req, res, next) => {
     try {
         const respon = await User.findAll();
         res.status(200).json({
             respon
         })
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        next(err)
     }
-}
+};
 
-export const getUser = async (req, res, next) => {
+export const findOneUser = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const user = await User.findByPk(id);
-        if (!user) return next(createError(404, "Id Not Found."))    
-        res.status(200).json({ user });
+        const respon = await User.findOne({ where: { id: req.params.id } })
+        if (!respon) return next(createError(404, "User tidak ditemukan!"))
+        res.status(200).json({ respon })
     } catch (err) {
         next(err);
     }
 };
 
-// export const getById = async (req, res, next) =>{
-//     try {
-//         const respon = await User.findOne({
-//             where: {
-//                 id :req.params.id
-//             }
-//         })
-//         if(!respon) return next(createError(404, "blablabla")) 
-//         res.status(200).json({
-//             respon
-//         })
-//     } catch (err) {
-//         next (err)
-//     }
-// }
-
-export const createUsers = async (req, res)=>{
+export const createUser = async (req, res, next) => {
     try {
         await User.create(req.body)
-        res.status(201).json({
-            msg : 'Data Berhasil Di Buat'
-        })
-    } catch (error) {
-        console.log(error);
-    }    
-}
-
-export const updateUsers = async(req, res)=>{
-    try {
-        await User.update(req.body,{
-            where:{
-                id:req.params.id
-            }
-        })
-        res.status(200).json({
-            msg : 'Data Berhasil Di Update'
-        })
-    } catch (error) {
-        console.log(error);
+        res.status(200).json({ msg: "Create berhasil." })
+    } catch (err) {
+        next(err);
     }
 }
 
-export const deleteUsers = async(req, res)=>{
+export const updateUser = async (req, res, next) => {
     try {
-        await User.destroy(req.body,{
-            where:{
-                id:req.params.id
+        await User.update(req.body, {
+            where: {
+                id: req.params.id
             }
         })
         res.status(200).json({
-            msg : 'Data Berhasil Di Hapus'
+            msg: 'Update Berhasil'
         })
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        next(err);
     }
-}
+};
+
+export const deleteUser = async (req, res, next) => {
+    try {
+        await User.destroy({
+            where: {
+                id: req.params.id
+            }
+        })
+        res.status(200).json({
+            msg: 'Data Berhasil Di Hapus'
+        })
+    } catch (err) {
+        next(err)
+    }
+};
 
